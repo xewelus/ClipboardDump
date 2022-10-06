@@ -8,3 +8,5 @@ code/UpgradeLog.htm
 _ReSharper.Caches/
 *.suo
 /ClipboardDump/obj/
+/ClipboardDump/outputs/
+*.csproj.user

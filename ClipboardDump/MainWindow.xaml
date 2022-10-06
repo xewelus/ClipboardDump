@@ -5,11 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClipboardDump"
         mc:Ignorable="d"
-        Title="MainWindow" 
-        Height="300" Width="400"
+        Title="Clipboard Dump" 
+        Height="70" Width="280"
         WindowStartupLocation="CenterScreen"
         d:DataContext="{d:DesignInstance local:MainWindow, IsDesignTimeCreatable=True}">
-    <Grid>
-        
-    </Grid>
+    <StackPanel VerticalAlignment="Center">
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+			<Button Margin="3" Padding="8,0,8,0" Click="DumpClipboard_OnClick">Dump clipboard</Button>
+			<Button Margin="3" Padding="8,0,8,0" Click="OpenDumpFolder_OnClick">Open dump folder</Button>
+		</StackPanel>
+	</StackPanel>
 </Window>
