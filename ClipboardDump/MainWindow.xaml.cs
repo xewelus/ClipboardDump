@@ -30,10 +30,9 @@ namespace ClipboardDump
 
 				string[] formats = dataObject.GetFormats().ToArray();
 
-				Dictionary<string, object> dic = formats.ToDictionary(f => f, f => dataObject.GetData(f));
 				string folder = FS.GetProjectPath("outputs", DateTime.Now.ToString("yyMMdd HHmmss"));
 				this.lastFolder = folder;
-				formats.ForEach(f => DumpData(dataObject: dataObject, f: f, folder: folder));
+				formats.ForEach(f => DumpData(dataObject: dataObject, format: f, folder: folder));
 
 				UIHelper.ShowMessage($"Processed formats: {formats.Length}");
 			}
@@ -43,49 +42,66 @@ namespace ClipboardDump
 			}
 		}
 
+		private static readonly char[] invalidChars = Path.GetInvalidFileNameChars();
 		private string lastFolder;
-		private static void DumpData(IDataObject dataObject, string f, string folder)
+		private static void DumpData(IDataObject dataObject, string format, string folder)
 		{
-			object o = dataObject.GetData(f);
-			string ext = ".log";
-			byte[] content = null;
-			if (o is MemoryStream ms)
+			try
 			{
-				byte[] bytes = ms.ToArray();
-				o = $"MemoryStream\r\n{BitConverter.ToString(bytes).Replace("-", " ")}";
-				ms.Position = 0;
-			}
-			else if (o is Bitmap bitmap)
-			{
-				using (MemoryStream stream = new MemoryStream())
+				object o = dataObject.GetData(format);
+				string ext = ".log";
+				byte[] content = null;
+				if (o is MemoryStream ms)
 				{
-					bitmap.Save(stream, ImageFormat.Png);
-					content = stream.ToArray();
-					ext = ".png";
+					byte[] bytes = ms.ToArray();
+					o = $"MemoryStream\r\n{BitConverter.ToString(bytes).Replace("-", " ")}";
+					ms.Position = 0;
+				}
+				else if (o is Bitmap bitmap)
+				{
+					using (MemoryStream stream = new MemoryStream())
+					{
+						bitmap.Save(stream, ImageFormat.Png);
+						content = stream.ToArray();
+						ext = ".png";
+					}
+				}
+				else if (o is Image image)
+				{
+					using (MemoryStream stream = new MemoryStream())
+					{
+						image.Save(stream, ImageFormat.Png);
+						content = stream.ToArray();
+						ext = ".png";
+					}
+				}
+				else if (o is string[] strings)
+				{
+					o = $"string[]\r\n{string.Join("\r\n", strings)}";
+				}
+
+				string filename = format + ext;
+				invalidChars.ForEach(c => filename = filename.Replace(c.ToString(), ((int)c).ToString()));
+				string file = FS.Combine(folder, filename);
+				FS.EnsureFileFolder(file);
+
+				if (content == null)
+				{
+					File.WriteAllText(file, o?.ToString() ?? "");
+				}
+				else
+				{
+					File.WriteAllBytes(file, content);
 				}
 			}
-			else if (o is Image image)
+			catch (Exception ex)
 			{
-				using (MemoryStream stream = new MemoryStream())
-				{
-					image.Save(stream, ImageFormat.Png);
-					content = stream.ToArray();
-					ext = ".png";
-				}
-			}
+				Exception exception = new Exception($"Error while process format '{format}'.", ex);
 
-			string filename = f + ext;
-			Path.GetInvalidFileNameChars().ForEach(c => filename = filename.Replace(c.ToString(), ((int)c).ToString()));
-			string file = FS.Combine(folder, filename);
-			FS.EnsureFileFolder(file);
+				string errorFile = Path.Combine(folder, "errors.log");
+				File.AppendAllText(errorFile, $"{exception}\r\n\r\n");
 
-			if (content == null)
-			{
-				File.WriteAllText(file, o?.ToString() ?? "");
-			}
-			else
-			{
-				File.WriteAllBytes(file, content);
+				ExceptionHandler.Catch(exception);
 			}
 		}
 
