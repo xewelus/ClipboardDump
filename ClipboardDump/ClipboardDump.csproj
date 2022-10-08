@@ -6,6 +6,7 @@
 		<AssemblyName>ClipboardDump</AssemblyName>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<UseWPF>true</UseWPF>
+		<ApplicationIcon>clipboard.ico</ApplicationIcon>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DebugType>none</DebugType>
@@ -18,6 +19,7 @@
 	  <Content Include="changes.txt">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
+	  <Content Include="clipboard.ico" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\CSCommon\CommonWpf\CommonWpf.csproj" />
