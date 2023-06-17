@@ -1,18 +1,33 @@
-<Window x:Class="ClipboardDump.MainWindow"
+<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ClipboardDump"
+        xmlns:Controls="clr-namespace:CommonWpf.Controls;assembly=CommonWpf"
+        xmlns:properties="clr-namespace:ClipboardDump.Properties"
+        x:Class="ClipboardDump.MainWindow"
         mc:Ignorable="d"
         Title="Clipboard Dump" 
-        Height="70" Width="280"
+        Height="190" Width="280"
         WindowStartupLocation="CenterScreen"
-        d:DataContext="{d:DesignInstance local:MainWindow, IsDesignTimeCreatable=True}">
-    <StackPanel VerticalAlignment="Center">
-		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-			<Button Margin="3" Padding="8,0,8,0" Click="DumpClipboard_OnClick">Dump clipboard</Button>
-			<Button Margin="3" Padding="8,0,8,0" Click="OpenDumpFolder_OnClick">Open dump folder</Button>
-		</StackPanel>
+        d:DataContext="{d:DesignInstance {x:Type local:MainWindow}, IsDesignTimeCreatable=True}">
+	<StackPanel VerticalAlignment="Top">
+		<GroupBox Header="Dump to temporary folder">
+			<StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+				<Button Margin="3" Padding="8,0,8,0" Click="DumpClipboard_OnClick" Content="Dump clipboard"/>
+				<Button Margin="3" Padding="8,0,8,0" Click="OpenDumpFolder_OnClick" Content="Open dump folder"/>
+			</StackPanel>
+		</GroupBox>
+		<GroupBox Header="Dump to specific folder" Margin="0,6,0,0">
+			<StackPanel Orientation="Vertical" HorizontalAlignment="Stretch">
+				<Controls:FolderBox x:Name="FolderBox" Margin="3" Text="{Binding Source={x:Static properties:Settings.Default}, Path=FolderBox, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextChanged="FolderBox_OnTextChanged" />
+				<StackPanel x:Name="StackPanelForSpecificFolder"  Orientation="Horizontal" HorizontalAlignment="Center">
+					<Button Margin="3" Padding="8,0,8,0" Click="DumpSpecificButton_OnClick" Content="Dump clipboard" />
+					<Button Margin="3" Padding="8,0,8,0" Click="OpenSpecificDumpFolder_OnClick" Content="Open dump folder"/>
+				</StackPanel>
+			</StackPanel>
+		</GroupBox>
+		<Label x:Name="StatusLabel" Foreground="Green">status...</Label>
 	</StackPanel>
 </Window>
